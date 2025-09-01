@@ -24,16 +24,15 @@ class AuthService {
     return response;
   }
 
-  async logout(): Promise<void> {
-    try {
-      await apiService.post('/auth/logout');
-    } catch (error) {
+  logout(): void {
+    // Clear local storage immediately for better UX
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('user_data');
+    
+    // Optional: Call logout API in background without blocking
+    apiService.post('/auth/logout').catch(error => {
       console.warn('Logout API call failed:', error);
-    } finally {
-      // Always clear local storage regardless of API response
-      localStorage.removeItem('auth_token');
-      localStorage.removeItem('user_data');
-    }
+    });
   }
 
   async refreshToken(): Promise<AuthResponse> {

@@ -7,6 +7,7 @@ import { PublicRoute } from './components/auth/PublicRoute';
 import { Layout } from './components/shared/Layout';
 
 // Pages
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
@@ -33,6 +34,16 @@ function App() {
         <Router>
           <div className="min-h-screen bg-gray-50">
             <Routes>
+              {/* Landing page */}
+              <Route
+                path="/"
+                element={
+                  <PublicRoute>
+                    <LandingPage />
+                  </PublicRoute>
+                }
+              />
+              
               {/* Public routes */}
               <Route
                 path="/login"
@@ -52,16 +63,6 @@ function App() {
               />
 
               {/* Protected routes */}
-              <Route
-                path="/"
-                element={
-                  <ProtectedRoute>
-                    <Layout>
-                      <DashboardPage />
-                    </Layout>
-                  </ProtectedRoute>
-                }
-              />
               <Route
                 path="/dashboard"
                 element={

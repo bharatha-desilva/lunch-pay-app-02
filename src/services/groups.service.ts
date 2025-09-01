@@ -11,17 +11,16 @@ class GroupsService {
   async getAll() {
     const groups = await groupsApi.getAll();
     
-    // Ensure all groups have valid IDs and filter out invalid ones
+    // API returns MongoDB-style _id fields, map them to id
     const processedGroups = groups
       .filter(group => group && typeof group === 'object')
-      .map((group, index) => ({
+      .map(group => ({
         ...group,
-        // Fallback ID generation if missing
-        id: group.id || `temp-${Date.now()}-${index}`
+        id: group.id || group._id || `group-${Date.now()}-${Math.random()}`
       }))
       .filter(group => group.id && group.id !== 'undefined' && group.id !== 'null');
     
-    // Advanced deduplication: prefer real IDs over temporary ones
+    // Simple deduplication by ID
     const uniqueGroups = new Map();
     
     processedGroups.forEach(group => {
@@ -31,7 +30,7 @@ class GroupsService {
       if (!existing) {
         uniqueGroups.set(key, group);
       } else {
-        // If we have a duplicate, prefer the one with more complete data
+        // If we have a duplicate ID, prefer the one with more complete data
         const hasMoreData = (group.members?.length || 0) >= (existing.members?.length || 0);
         if (hasMoreData) {
           uniqueGroups.set(key, group);
@@ -39,52 +38,30 @@ class GroupsService {
       }
     });
     
-    // Also check for name-based duplicates (different IDs, same name)
-    const nameMap = new Map<string, Group>();
-    const finalGroups: Group[] = [];
-    
-    for (const group of uniqueGroups.values()) {
-      const existingWithSameName = nameMap.get(group.name);
-      
-      if (!existingWithSameName) {
-        nameMap.set(group.name, group);
-        finalGroups.push(group);
-      } else {
-        // Prefer real IDs over temporary ones
-        const isCurrentReal = !group.id.startsWith('temp-');
-        const isExistingReal = !existingWithSameName.id.startsWith('temp-');
-        
-        if (isCurrentReal && !isExistingReal) {
-          // Replace temporary with real
-          nameMap.set(group.name, group);
-          const index = finalGroups.findIndex(g => g.id === existingWithSameName.id);
-          if (index >= 0) {
-            finalGroups[index] = group;
-          }
-        } else if (!isCurrentReal && !isExistingReal) {
-          // Both are temporary, keep the first one
-          // Do nothing
-        } else if (!isCurrentReal && isExistingReal) {
-          // Keep the existing real ID
-          // Do nothing
-        } else {
-          // Both are real IDs but same name - this suggests data issues
-          // Keep both but log the issue
-          console.warn('Duplicate group names with different IDs:', group.name, group.id, existingWithSameName.id);
-          finalGroups.push(group);
-        }
-      }
-    }
-    
-    return finalGroups;
+    return Array.from(uniqueGroups.values());
   }
 
   async getById(id: string) {
-    return groupsApi.getById(id);
+    const group = await groupsApi.getById(id);
+    
+    // Apply same ID mapping as in getAll
+    if (group) {
+      return {
+        ...group,
+        id: group.id || group._id || id
+      };
+    }
+    
+    return group;
   }
 
   async create(data: CreateGroupData) {
-    return groupsApi.saveNew(data);
+    // Ensure new groups have an empty members array
+    const groupWithMembers = {
+      ...data,
+      members: [] // Initialize with empty members array
+    };
+    return groupsApi.saveNew(groupWithMembers);
   }
 
   async update(data: Partial<Group> & { id: string }) {
@@ -95,38 +72,101 @@ class GroupsService {
     return groupsApi.delete(id);
   }
 
-  // Custom operations
+  // Custom operations - Client-side member management using single-level API
   async addMember(data: AddMemberData): Promise<Group> {
+    // Check if this is a temporary group ID
+    if (data.groupId.startsWith('temp-')) {
+      throw new Error('Cannot add members to a group that hasn\'t been properly created yet. Please refresh the page and try again.');
+    }
+    
     try {
-      const response = await apiService.post<Group>(
-        `/groups/${data.groupId}/members`,
-        { email: data.email }
+      // Step 1: Get the current group
+      const currentGroup = await this.getById(data.groupId);
+      
+      // Step 2: Look up or create user by email
+      let newMember;
+      try {
+        // Try to find existing user by email
+        const existingUsers = await this.searchUsers(data.email);
+        newMember = existingUsers.find(user => user.email === data.email);
+      } catch (error) {
+        // If user search fails, continue with mock user
+      }
+      
+      // If no existing user found, create a mock member object
+      if (!newMember) {
+        newMember = {
+          id: `user-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+          name: data.email.split('@')[0], // Extract name from email
+          email: data.email
+        };
+      }
+      
+      // Step 3: Check if member already exists in the group
+      const existingMembers = currentGroup.members || [];
+      const memberExists = existingMembers.some(member => 
+        member.email === data.email || member.id === newMember.id
       );
+      
+      if (memberExists) {
+        throw new Error('User is already a member of this group.');
+      }
+      
+      // Step 4: Add member to the group's members array
+      const updatedMembers = [...existingMembers, newMember];
+      
+      // Step 5: Update the group with the new members array
+      const updatedGroup = {
+        id: currentGroup.id,
+        name: currentGroup.name,
+        description: currentGroup.description,
+        members: updatedMembers,
+        adminId: currentGroup.adminId,
+        createdAt: currentGroup.createdAt
+      };
+      
+      // Step 6: Save the updated group back to the API
+      const response = await this.update(updatedGroup);
       return response;
+      
     } catch (error) {
       throw error;
     }
   }
 
   async removeMember(groupId: string, userId: string): Promise<Group> {
+    // Check if this is a temporary group ID
+    if (groupId.startsWith('temp-')) {
+      throw new Error('Cannot remove members from a group that hasn\'t been properly created yet. Please refresh the page and try again.');
+    }
+    
     try {
-      const response = await apiService.post<Group>(
-        `/groups/${groupId}/members/${userId}/remove`
-      );
+      // Step 1: Get the current group
+      const currentGroup = await this.getById(groupId);
+      
+      // Step 2: Remove the member from the members array
+      const updatedMembers = (currentGroup.members || []).filter(member => member.id !== userId);
+      
+      // Step 3: Update the group with the filtered members array
+      const updatedGroup = {
+        id: currentGroup.id,
+        name: currentGroup.name,
+        description: currentGroup.description,
+        members: updatedMembers,
+        adminId: currentGroup.adminId,
+        createdAt: currentGroup.createdAt
+      };
+      
+      // Step 4: Save the updated group back to the API
+      const response = await this.update(updatedGroup);
       return response;
+      
     } catch (error) {
       throw error;
     }
   }
 
-  async getMembers(groupId: string): Promise<User[]> {
-    try {
-      const response = await apiService.get<User[]>(`/groups/${groupId}/members`);
-      return response;
-    } catch (error) {
-      throw error;
-    }
-  }
+  // Note: Members are included in the group object, no separate endpoint needed
 
   async searchUsers(query: string): Promise<User[]> {
     try {

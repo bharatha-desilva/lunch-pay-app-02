@@ -2,6 +2,7 @@ import { User } from './auth.types';
 
 export interface Group {
   id: string;
+  _id?: string; // MongoDB style ID
   name: string;
   description?: string;
   members?: User[];

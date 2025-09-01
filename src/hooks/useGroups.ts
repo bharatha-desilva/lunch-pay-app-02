@@ -142,32 +142,16 @@ export function useGroup(groupId: string) {
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
 
-  // Fetch group members
-  const membersQuery = useQuery({
-    queryKey: ['groups', groupId, 'members'],
-    queryFn: async () => {
-      // For temporary IDs, try to get members from cached group data
-      if (groupId.startsWith('temp-')) {
-        const cachedGroups = queryClient.getQueryData<Group[]>(['groups']);
-        const cachedGroup = cachedGroups?.find(g => g.id === groupId);
-        return cachedGroup?.members || [];
-      }
-      
-      // For real IDs, call the API
-      return groupsService.getMembers(groupId);
-    },
-    enabled: !!groupId,
-    staleTime: 5 * 60 * 1000, // 5 minutes
-  });
+  // Get members directly from the group object (no separate API call needed)
+  const members = groupQuery.data?.members || [];
 
   return {
     group: groupQuery.data,
-    members: membersQuery.data || [],
-    isLoading: groupQuery.isLoading || membersQuery.isLoading,
-    error: groupQuery.error || membersQuery.error,
+    members,
+    isLoading: groupQuery.isLoading,
+    error: groupQuery.error,
     refetch: () => {
       groupQuery.refetch();
-      membersQuery.refetch();
     },
   };
 }

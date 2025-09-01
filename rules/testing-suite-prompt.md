@@ -2,7 +2,7 @@
 
 ## 🧪 **Primary Objective**
 
-Produce comprehensive testing suite covering Unit Tests, Integration Tests, and E2E Tests with ≥80% functional coverage and proper mocking strategies.
+Produce comprehensive testing suite covering Unit Tests and Integration Tests with ≥70% functional coverage and proper mocking strategies.
 
 ## 📋 **Core Testing Requirements**
 
@@ -10,8 +10,7 @@ Produce comprehensive testing suite covering Unit Tests, Integration Tests, and 
 
 - **Unit Tests**: Jest + React Testing Library for component and utility testing
 - **Integration Tests**: Component interaction and data flow testing
-- **E2E Tests**: Playwright or Cypress for end-to-end user workflows
-- **Coverage Target**: Aim for ≥80% functional coverage
+- **Coverage Target**: Aim for ≥70% functional coverage
 - **Test Data**: Use realistic test data fixtures and mocks
 
 ### **2. External Service Mocking**
@@ -25,7 +24,7 @@ Produce comprehensive testing suite covering Unit Tests, Integration Tests, and 
 ### **3. Test Execution**
 
 - **Single Command**: Provide one command to run all tests with coverage
-- **Individual Suites**: Separate commands for unit, integration, and E2E tests
+- **Individual Suites**: Separate commands for unit and integration
 - **CI Integration**: Include guidance for continuous integration execution
 - **Parallel Execution**: Optimize test suite for CI/CD pipeline performance
 
@@ -44,7 +43,7 @@ Produce comprehensive testing suite covering Unit Tests, Integration Tests, and 
 
 - **User Stories Mapping**: Map tests to specific user story requirements
 - **SRS Requirements**: Align test coverage with software requirements
-- **Test Categories**: Unit, Integration, and E2E test breakdown
+- **Test Categories**: Unit and Integration
 - **Coverage Goals**: Specific coverage targets per component/module
 
 #### **2. Directory Structure**
@@ -60,9 +59,6 @@ tests/
 │   ├── component-interactions/
 │   ├── data-flow/
 │   └── api-integration/
-├── e2e/
-│   ├── user-workflows/
-│   ├── critical-paths/
 └── fixtures/
     ├── mock-data/
     ├── test-users/
@@ -73,7 +69,6 @@ tests/
 
 - **Unit Test Examples**: Component testing with React Testing Library
 - **Integration Test Examples**: Component interaction testing
-- **E2E Test Examples**: User workflow testing
 - **Mock Examples**: External service mocking patterns
 
 #### **4. Test Commands**
@@ -81,7 +76,6 @@ tests/
 - **All Tests**: `npm run test:coverage` - Run complete test suite
 - **Unit Tests**: `npm run test:unit` - Run unit tests only
 - **Integration Tests**: `npm run test:integration` - Run integration tests
-- **E2E Tests**: `npm run test:e2e` - Run end-to-end tests
 - **Coverage Report**: `npm run test:coverage:report` - Generate coverage report
 
 #### **5. CI Integration Notes**
@@ -104,7 +98,6 @@ tests/
 
 - **Unit Tests**: Test individual components and functions in isolation
 - **Integration Tests**: Test component interactions and data flow
-- **E2E Tests**: Test complete user workflows and critical paths
 - **Mock Strategy**: Comprehensive mocking of external dependencies
 - **Test Data**: Realistic fixtures that represent production scenarios
 
@@ -112,7 +105,6 @@ tests/
 
 - **Jest**: Primary testing framework with proper configuration
 - **React Testing Library**: Component testing with user-centric approach
-- **Playwright/Cypress**: E2E testing for user workflows
 - **Coverage Tools**: Istanbul/nyc for coverage reporting
 - **Mock Libraries**: Jest mocks, MSW, or similar for API mocking
 
@@ -129,8 +121,7 @@ tests/
 
 - ✅ All unit tests pass
 - ✅ Integration tests pass
-- ✅ E2E tests pass
-- ✅ Coverage meets ≥90% target
+- ✅ Coverage meets ≥70% target
 - ✅ Mock strategy properly implemented
 
 ### **Test Execution Verification**
@@ -142,12 +133,11 @@ tests/
 
 ## 🎯 **Success Criteria**
 
-1. **Comprehensive Coverage**: ≥90% functional test coverage
-2. **Test Types**: Unit, Integration, and E2E tests implemented
-3. **Mock Strategy**: External services properly mocked
-4. **Test Execution**: Single command runs complete test suite
-5. **CI Integration**: Tests run successfully in CI pipeline
-6. **Documentation**: Complete testing suite documentation
+1. **Comprehensive Coverage**: ≥70% functional test coverage
+2. **Mock Strategy**: External services properly mocked
+3. **Test Execution**: Single command runs complete test suite
+4. **CI Integration**: Tests run successfully in CI pipeline
+5. **Documentation**: Complete testing suite documentation
 
 ## 📝 **Example Test Implementation**
 

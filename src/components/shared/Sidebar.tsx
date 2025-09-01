@@ -10,7 +10,7 @@ import { cn } from '../../utils/cn';
 
 export function Sidebar() {
   const location = useLocation();
-  const { groups, isLoading } = useGroups();
+  const { groups, isLoading, error } = useGroups();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Filter out groups without valid IDs and duplicates
@@ -18,6 +18,8 @@ export function Sidebar() {
   const uniqueGroups = validGroups.filter((group, index, self) => 
     index === self.findIndex(g => g.id === group.id)
   );
+  
+
 
   const isActive = (path: string) => {
     return location.pathname === path;
@@ -62,7 +64,11 @@ export function Sidebar() {
               </Button>
             </div>
 
-            {isLoading ? (
+            {error ? (
+              <div className="px-3 py-2 text-xs text-red-600 bg-red-50 rounded">
+                Error loading groups: {error.message}
+              </div>
+            ) : isLoading ? (
               <div className="space-y-2">
                 {[1, 2, 3].map((i) => (
                   <div

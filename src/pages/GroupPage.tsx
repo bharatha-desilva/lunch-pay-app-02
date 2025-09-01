@@ -99,7 +99,11 @@ export default function GroupPage() {
     return (
       <div className="flex flex-col items-center justify-center py-12">
         <h2 className="text-xl font-semibold text-gray-900 mb-2">Group not found</h2>
-        <p className="text-gray-600">The group you're looking for doesn't exist or you don't have access to it.</p>
+        <p className="text-gray-600 mb-4">The group you're looking for doesn't exist or you don't have access to it.</p>
+        <div className="text-sm text-gray-500 bg-gray-100 p-4 rounded">
+          <p><strong>Group ID:</strong> {groupId}</p>
+          <p><strong>Error:</strong> {error?.message || 'No group data'}</p>
+        </div>
       </div>
     );
   }

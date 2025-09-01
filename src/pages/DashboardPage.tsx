@@ -7,16 +7,18 @@ import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/Button';
 import { Modal } from '../components/ui/Modal';
 import { CreateGroupForm } from '../components/groups/CreateGroupForm';
+import { RefreshPrompt } from '../components/ui/RefreshPrompt';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
 import { formatCurrency, formatUserName } from '../utils/formatters';
 
 export default function DashboardPage() {
   const { user } = useAuth();
-  const { groups, isLoading } = useGroups();
+  const { groups, isLoading, refetch } = useGroups();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Filter out groups without valid IDs
   const validGroups = groups.filter(group => group.id && group.id !== 'undefined' && group.id !== 'null');
+  const hasTemporaryGroups = groups.some(group => group.id && group.id.startsWith('temp-'));
 
   if (isLoading) {
     return (
@@ -41,6 +43,14 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-6">
+      {/* Refresh prompt for temporary groups */}
+      {hasTemporaryGroups && (
+        <RefreshPrompt 
+          message="Some groups are still being synchronized. Please refresh to see the latest data."
+          onRefresh={refetch}
+        />
+      )}
+      
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>

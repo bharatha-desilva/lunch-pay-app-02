@@ -15,6 +15,7 @@ interface AddMemberFormProps {
 
 export function AddMemberForm({ groupId, onSuccess, onCancel }: AddMemberFormProps) {
   const { addMember, isAddingMember, addMemberError } = useGroups();
+  const isTemporaryGroup = groupId.startsWith('temp-');
 
   const {
     register,
@@ -27,6 +28,12 @@ export function AddMemberForm({ groupId, onSuccess, onCancel }: AddMemberFormPro
 
   const onSubmit = async (data: { email: string }) => {
     try {
+      // Check if this is a temporary group
+      if (groupId.startsWith('temp-')) {
+        console.error('Cannot add members to temporary group:', groupId);
+        return;
+      }
+      
       const memberData: AddMemberData = {
         groupId,
         email: data.email,
@@ -49,6 +56,12 @@ export function AddMemberForm({ groupId, onSuccess, onCancel }: AddMemberFormPro
         </CardDescription>
       </CardHeader>
       <CardContent>
+        {isTemporaryGroup && (
+          <div className="p-3 text-sm text-yellow-600 bg-yellow-50 border border-yellow-200 rounded-md mb-4">
+            This group is not yet fully created. Please refresh the page to see the latest groups, then try adding members.
+          </div>
+        )}
+        
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           {addMemberError && (
             <div className="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
@@ -77,7 +90,7 @@ export function AddMemberForm({ groupId, onSuccess, onCancel }: AddMemberFormPro
               type="submit"
               className="flex-1"
               loading={isAddingMember}
-              disabled={isAddingMember}
+              disabled={isAddingMember || isTemporaryGroup}
             >
               {isAddingMember ? 'Adding...' : 'Add Member'}
             </Button>

@@ -29,7 +29,7 @@ export const performanceMonitor = {
   // Log memory usage (development only)
   logMemoryUsage: (context: string) => {
     if (process.env.NODE_ENV === 'development' && 'memory' in performance) {
-      const memory = (performance as any).memory;
+      const memory = (performance as unknown as { memory: { usedJSHeapSize: number; totalJSHeapSize: number; jsHeapSizeLimit: number } }).memory;
       console.log(`Memory usage (${context}):`, {
         used: `${Math.round(memory.usedJSHeapSize / 1024 / 1024)} MB`,
         total: `${Math.round(memory.totalJSHeapSize / 1024 / 1024)} MB`,
@@ -49,7 +49,7 @@ export const performanceMonitor = {
 // Bundle size optimization utilities
 export const bundleOptimization = {
   // Lazy import with error handling
-  lazyImport: <T extends { default: any }>(importFn: () => Promise<T>) => {
+  lazyImport: <T extends { default: unknown }>(importFn: () => Promise<T>) => {
     return React.lazy(async () => {
       try {
         return await importFn();
@@ -152,15 +152,15 @@ export function useExpensiveCalculation<T>(
       return result;
     }
     return calculationFn();
-  }, deps);
+  }, [...(Array.isArray(deps) ? deps : []), calculationFn, debugName]);
 }
 
 // Hook for performance-optimized callbacks
-export function useStableCallback<T extends (...args: any[]) => any>(
+export function useStableCallback<T extends (...args: unknown[]) => unknown>(
   callback: T,
   deps: React.DependencyList
 ): T {
-  return useCallback(callback, deps);
+  return useCallback(callback, deps) as T;
 }
 
 // Hook to detect slow renders
@@ -182,7 +182,7 @@ export function useRenderPerformance(componentName: string, threshold = 16) {
 
 // Virtual scrolling utilities for large lists
 export function useVirtualScrolling(
-  items: any[],
+  items: unknown[],
   itemHeight: number,
   containerHeight: number,
   buffer = 5

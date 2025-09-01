@@ -39,23 +39,15 @@ class ExpensesService {
 
   // Balance operations
   async getBalances(groupId: string): Promise<Balance[]> {
-    try {
-      const response = await apiService.get<Balance[]>(`/groups/${groupId}/balances`);
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiService.get<Balance[]>(`/groups/${groupId}/balances`);
+    return response;
   }
 
   async getUserBalance(groupId: string, userId: string): Promise<Balance> {
-    try {
-      const response = await apiService.get<Balance>(
-        `/groups/${groupId}/balances/${userId}`
-      );
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiService.get<Balance>(
+      `/groups/${groupId}/balances/${userId}`
+    );
+    return response;
   }
 
   // Settlement operations
@@ -83,15 +75,11 @@ class ExpensesService {
 
   // Utility operations
   async searchExpenses(groupId: string, query: string): Promise<Expense[]> {
-    try {
-      const response = await apiService.get<Expense[]>('/expenses/search', {
-        group_id: groupId,
-        q: query,
-      });
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiService.get<Expense[]>('/expenses/search', {
+      group_id: groupId,
+      q: query,
+    });
+    return response;
   }
 
   // Calculate split amounts

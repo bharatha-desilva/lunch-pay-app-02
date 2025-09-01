@@ -26,33 +26,75 @@ export function formatAmount(amount: number): string {
  * Format dates
  */
 export function formatDate(date: string | Date): string {
-  return format(new Date(date), 'MMM dd, yyyy');
+  try {
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return 'Invalid date';
+    }
+    return format(parsedDate, 'MMM dd, yyyy');
+  } catch {
+    return 'Invalid date';
+  }
 }
 
 export function formatDateTime(date: string | Date): string {
-  return format(new Date(date), 'MMM dd, yyyy \'at\' h:mm a');
+  try {
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return 'Invalid date';
+    }
+    return format(parsedDate, 'MMM dd, yyyy \'at\' h:mm a');
+  } catch {
+    return 'Invalid date';
+  }
 }
 
 export function formatDateShort(date: string | Date): string {
-  return format(new Date(date), 'MM/dd/yyyy');
+  try {
+    const parsedDate = new Date(date);
+    if (isNaN(parsedDate.getTime())) {
+      return 'Invalid date';
+    }
+    return format(parsedDate, 'MM/dd/yyyy');
+  } catch {
+    return 'Invalid date';
+  }
 }
 
 /**
  * Format user names
  */
 export function formatUserName(user: { name?: string; email: string }): string {
-  return user.name || user.email.split('@')[0];
+  if (!user || typeof user !== 'object') {
+    return 'Unknown User';
+  }
+  
+  if (user.name && typeof user.name === 'string') {
+    return user.name;
+  }
+  
+  if (user.email && typeof user.email === 'string') {
+    return user.email.split('@')[0];
+  }
+  
+  return 'Unknown User';
 }
 
 /**
  * Format initials for avatars
  */
 export function getInitials(name: string): string {
+  if (!name || typeof name !== 'string') {
+    return 'U';
+  }
+  
   return name
+    .trim()
     .split(' ')
+    .filter(word => word.length > 0)
     .map(word => word.charAt(0).toUpperCase())
     .slice(0, 2)
-    .join('');
+    .join('') || 'U';
 }
 
 /**

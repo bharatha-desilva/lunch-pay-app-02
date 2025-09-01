@@ -9,6 +9,9 @@ import { Modal } from '../components/ui/Modal';
 import { ExpenseForm } from '../components/expenses/ExpenseForm';
 import { ExpenseList } from '../components/expenses/ExpenseList';
 import { BalanceSummary } from '../components/balances/BalanceSummary';
+import { BalanceList } from '../components/balances/BalanceList';
+import { useExpenses } from '../hooks/useExpenses';
+import { calculateBalances, getUserBalance, calculateBalanceSummary } from '../utils/balanceCalculations';
 
 import { MemberList } from '../components/groups/MemberList';
 import { AddMemberForm } from '../components/groups/AddMemberForm';
@@ -21,21 +24,53 @@ import { DEFAULT_CATEGORIES } from '../components/categories/CategoryManager';
 
 export default function GroupPage() {
   const { groupId } = useParams<{ groupId: string }>();
-  const { group, members, isLoading, error } = useGroup(groupId!);
+  
+  // Call all hooks first (before any conditional returns)
+  const { group, members, isLoading, error } = useGroup(groupId || '');
   const { removeMember } = useGroups();
   const { user } = useAuth();
+  const { expenses, isLoading: expensesLoading } = useExpenses(groupId);
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
   const [isGroupSettingsOpen, setIsGroupSettingsOpen] = useState(false);
   const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
+  
+  // Early return if no groupId (after all hooks are called)
+  if (!groupId) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-2">Group Not Found</h1>
+          <p className="text-gray-600">Invalid group ID</p>
+        </div>
+      </div>
+    );
+  }
 
-  // Mock data for demonstration - will be replaced with real data in Iteration 2
-  const mockExpenses: never[] = [];
-  const mockBalances = [
-    { userId: '1', amount: 25.50 },
-    { userId: '2', amount: -15.25 },
-    { userId: '3', amount: -10.25 },
-  ];
+  // Calculate balances from expenses (client-side calculation)
+  const balances = calculateBalances(expenses || []);
+  const userBalance = getUserBalance(balances, user?.id || '');
+  const { totalBalance, totalOwed, totalOwing } = calculateBalanceSummary(userBalance);
+  
+  // Create enhanced balances with user information for components that need it
+  const balancesWithUsers = balances
+    .filter(balance => balance.userId && balance.userId !== user?.id) // Exclude current user and invalid IDs
+    .map(balance => {
+      const member = members.find(m => m.id === balance.userId);
+      if (!member) return null; // Skip if member not found
+      
+      return {
+        ...balance,
+        user: member
+      };
+    })
+    .filter((balance): balance is NonNullable<typeof balance> => balance !== null) // Remove null entries with type guard
+    .filter((balance, index, array) => 
+      // Remove duplicates based on userId
+      array.findIndex(b => b.userId === balance.userId) === index
+    );
+  
+  // Mock settlements data - will be replaced with real settlements in later iteration
   const mockSettlements: Array<{
     id: string;
     groupId: string;
@@ -55,9 +90,6 @@ export default function GroupPage() {
       createdAt: new Date().toISOString(),
     }
   ];
-  const totalBalance = 0;
-  const totalOwed = 0;
-  const totalOwing = 0;
 
   // Handle member removal
   const handleRemoveMember = async (userId: string) => {
@@ -154,7 +186,7 @@ export default function GroupPage() {
         totalBalance={totalBalance}
         totalOwed={totalOwed}
         totalOwing={totalOwing}
-        isLoading={false}
+        isLoading={expensesLoading}
       />
 
       <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
@@ -170,17 +202,35 @@ export default function GroupPage() {
           />
           
           <SettlementSuggestions
-            balances={mockBalances}
+            balances={balances}
             groupMembers={members}
             onRecordSettlement={handleRecordSettlement}
           />
+          
+          {balancesWithUsers.length > 0 && (
+            <BalanceList
+              balances={balancesWithUsers}
+              currentUserId={user?.id || ''}
+              onSettle={(userId, amount) => console.log('Settle:', userId, amount)}
+              isLoading={expensesLoading}
+            />
+          )}
         </div>
 
         {/* Middle Column - Recent Expenses */}
-        <ExpenseList 
-          expenses={mockExpenses}
-          isLoading={false}
-        />
+        <div className="space-y-4">
+          <ExpenseList 
+            expenses={(expenses || []).filter(expense => 
+              expense && 
+              expense.id && 
+              typeof expense.id === 'string' &&
+              expense.description &&
+              typeof expense.amount === 'number'
+            )}
+            groupMembers={members}
+            isLoading={expensesLoading}
+          />
+        </div>
 
         {/* Right Column - Settlement History */}
         <SettlementHistory

@@ -4,7 +4,6 @@ import {
   Expense, 
   CreateExpenseData, 
   Category, 
-  Balance, 
   Settlement 
 } from '../types/expense.types';
 import { QueryParams } from '../types/api.types';
@@ -100,7 +99,6 @@ export function useExpense(expenseId: string) {
 }
 
 export function useBalances(groupId: string) {
-  const queryClient = useQueryClient();
 
   const balancesQuery = useQuery({
     queryKey: ['balances', groupId],

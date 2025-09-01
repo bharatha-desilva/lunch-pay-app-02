@@ -1,4 +1,4 @@
-import { User, UserPlus, UserMinus } from 'lucide-react';
+import { UserPlus, UserMinus } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { formatUserName, getInitials } from '../../utils/formatters';

@@ -1,6 +1,6 @@
 import { Calendar, DollarSign, User, Tag } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { formatCurrency, formatDate, formatUserName, getInitials } from '../../utils/formatters';
+import { formatCurrency, formatDate, formatUserName } from '../../utils/formatters';
 import { Expense } from '../../types/expense.types';
 import { User as UserType } from '../../types/auth.types';
 

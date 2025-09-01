@@ -1,7 +1,7 @@
 
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Plus, Users, DollarSign, Settings, CreditCard } from 'lucide-react';
+import { Plus, Users, Settings, CreditCard } from 'lucide-react';
 import { useGroup, useGroups } from '../hooks/useGroups';
 import { useAuth } from '../hooks/useAuth';
 import { Button } from '../components/ui/Button';
@@ -9,7 +9,7 @@ import { Modal } from '../components/ui/Modal';
 import { ExpenseForm } from '../components/expenses/ExpenseForm';
 import { ExpenseList } from '../components/expenses/ExpenseList';
 import { BalanceSummary } from '../components/balances/BalanceSummary';
-import { BalanceList } from '../components/balances/BalanceList';
+
 import { MemberList } from '../components/groups/MemberList';
 import { AddMemberForm } from '../components/groups/AddMemberForm';
 import { GroupSettings } from '../components/groups/GroupSettings';
@@ -17,13 +17,12 @@ import { SettlementForm } from '../components/settlements/SettlementForm';
 import { SettlementHistory } from '../components/settlements/SettlementHistory';
 import { SettlementSuggestions } from '../components/settlements/SettlementSuggestions';
 import { DEFAULT_CATEGORIES } from '../components/categories/CategoryManager';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/Card';
-import { formatUserName } from '../utils/formatters';
+
 
 export default function GroupPage() {
   const { groupId } = useParams<{ groupId: string }>();
   const { group, members, isLoading, error } = useGroup(groupId!);
-  const { removeMember, isRemovingMember } = useGroups();
+  const { removeMember } = useGroups();
   const { user } = useAuth();
   const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
   const [isAddMemberModalOpen, setIsAddMemberModalOpen] = useState(false);
@@ -31,13 +30,21 @@ export default function GroupPage() {
   const [isSettlementModalOpen, setIsSettlementModalOpen] = useState(false);
 
   // Mock data for demonstration - will be replaced with real data in Iteration 2
-  const mockExpenses: any[] = [];
+  const mockExpenses: never[] = [];
   const mockBalances = [
     { userId: '1', amount: 25.50 },
     { userId: '2', amount: -15.25 },
     { userId: '3', amount: -10.25 },
   ];
-  const mockSettlements: any[] = [
+  const mockSettlements: Array<{
+    id: string;
+    groupId: string;
+    fromUserId: string;
+    toUserId: string;
+    amount: number;
+    description: string;
+    createdAt: string;
+  }> = [
     {
       id: '1',
       groupId: groupId || '',
@@ -70,7 +77,7 @@ export default function GroupPage() {
   };
 
   // Handle settlement recording
-  const handleRecordSettlement = (settlement: { fromUserId: string; toUserId: string; amount: number }) => {
+  const handleRecordSettlement = () => {
     setIsSettlementModalOpen(true);
     // Could pre-populate the form with settlement data here
   };

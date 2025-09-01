@@ -255,7 +255,7 @@ export function ExpenseForm({
                 <button
                   key={option.value}
                   type="button"
-                  onClick={() => setSplitType(option.value as any)}
+                  onClick={() => setSplitType(option.value as 'equal' | 'unequal' | 'percentage')}
                   className={`px-3 py-2 text-sm rounded-md transition-colors ${
                     splitType === option.value
                       ? 'bg-blue-600 text-white'

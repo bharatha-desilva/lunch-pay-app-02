@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosResponse, AxiosError } from 'axios';
-import { ApiResponse, QueryParams, BaseEntity } from '../types/api.types';
+import { QueryParams, BaseEntity } from '../types/api.types';
 
 class ApiService {
   private api: AxiosInstance;
@@ -45,7 +45,7 @@ class ApiService {
   }
 
   // Helper method to extract data from response (handles both wrapped and plain responses)
-  private extractData<T>(response: any): T {
+  private extractData<T>(response: AxiosResponse): T {
     // If response has a data wrapper with success field, use that structure
     if (response.data && typeof response.data === 'object' && 'data' in response.data) {
       return response.data.data;

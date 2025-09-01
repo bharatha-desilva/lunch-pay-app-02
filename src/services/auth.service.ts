@@ -3,33 +3,25 @@ import { LoginCredentials, RegisterData, AuthResponse, User } from '../types/aut
 
 class AuthService {
   async login(credentials: LoginCredentials): Promise<AuthResponse> {
-    try {
-      const response = await apiService.post<AuthResponse>('/auth/login', credentials);
-      
-      // Store token and user data
-      localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('user_data', JSON.stringify(response.user));
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiService.post<AuthResponse>('/auth/login', credentials);
+    
+    // Store token and user data
+    localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('user_data', JSON.stringify(response.user));
+    
+    return response;
   }
 
   async register(data: RegisterData): Promise<AuthResponse> {
-    try {
-      // Remove confirmPassword before sending to API
-      const { ...registerData } = data;
-      const response = await apiService.post<AuthResponse>('/auth/register', registerData);
-      
-      // Store token and user data
-      localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('user_data', JSON.stringify(response.user));
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    // Remove confirmPassword before sending to API
+    const { ...registerData } = data;
+    const response = await apiService.post<AuthResponse>('/auth/register', registerData);
+    
+    // Store token and user data
+    localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('user_data', JSON.stringify(response.user));
+    
+    return response;
   }
 
   async logout(): Promise<void> {
@@ -45,17 +37,13 @@ class AuthService {
   }
 
   async refreshToken(): Promise<AuthResponse> {
-    try {
-      const response = await apiService.post<AuthResponse>('/auth/refresh');
-      
-      // Update stored token and user data
-      localStorage.setItem('auth_token', response.token);
-      localStorage.setItem('user_data', JSON.stringify(response.user));
-      
-      return response;
-    } catch (error) {
-      throw error;
-    }
+    const response = await apiService.post<AuthResponse>('/auth/refresh');
+    
+    // Update stored token and user data
+    localStorage.setItem('auth_token', response.token);
+    localStorage.setItem('user_data', JSON.stringify(response.user));
+    
+    return response;
   }
 
   getCurrentUser(): User | null {

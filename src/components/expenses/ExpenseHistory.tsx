@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { ChevronDown, ChevronUp, Calendar, DollarSign, Users, ArrowUpDown } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -28,10 +28,10 @@ export function ExpenseHistory({
   const [pageSize] = useState(10);
 
   // Get user name helper
-  const getUserName = (userId: string) => {
+  const getUserName = useCallback((userId: string) => {
     const user = groupMembers.find(m => m.id === userId);
     return user ? (user.name || user.email) : 'Unknown User';
-  };
+  }, [groupMembers]);
 
   // Get category color helper
   const getCategoryColor = (category: string) => {
@@ -53,7 +53,7 @@ export function ExpenseHistory({
   // Sorting logic
   const sortedExpenses = useMemo(() => {
     return [...expenses].sort((a, b) => {
-      let aValue: any, bValue: any;
+      let aValue: string | number, bValue: string | number;
       
       switch (sortField) {
         case 'date':
@@ -80,7 +80,7 @@ export function ExpenseHistory({
       if (aValue > bValue) return sortDirection === 'asc' ? 1 : -1;
       return 0;
     });
-  }, [expenses, sortField, sortDirection, groupMembers]);
+  }, [expenses, sortField, sortDirection, getUserName]);
 
   // Pagination
   const totalPages = Math.ceil(sortedExpenses.length / pageSize);

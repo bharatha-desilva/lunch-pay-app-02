@@ -15,7 +15,7 @@ export function useGroups() {
   // Create group mutation
   const createGroupMutation = useMutation({
     mutationFn: (data: CreateGroupData) => groupsService.create(data),
-    onSuccess: (newGroup) => {
+    onSuccess: () => {
       // Just invalidate to refetch fresh data from server
       // This prevents cache inconsistencies and duplicates
       queryClient.invalidateQueries({ queryKey: ['groups'] });

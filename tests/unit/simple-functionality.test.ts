@@ -80,8 +80,8 @@ describe('Core Business Logic', () => {
       };
 
       const settlements = [];
-      const debtors = Object.entries(balances).filter(([_, balance]) => balance < 0);
-      const creditors = Object.entries(balances).filter(([_, balance]) => balance > 0);
+      const debtors = Object.entries(balances).filter(([, balance]) => balance < 0);
+      const creditors = Object.entries(balances).filter(([, balance]) => balance > 0);
 
       debtors.forEach(([debtor, debt]) => {
         creditors.forEach(([creditor, credit]) => {
@@ -195,7 +195,7 @@ describe('Core Business Logic', () => {
       };
 
       const name = user?.profile?.name;
-      const phone = (user as any)?.profile?.phone || 'Not provided';
+      const phone = (user as { profile?: { phone?: string } })?.profile?.phone || 'Not provided';
 
       expect(name).toBe('John Doe');
       expect(phone).toBe('Not provided');

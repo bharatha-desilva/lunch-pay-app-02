@@ -3,11 +3,11 @@
  * Tests utility functions for formatting data
  */
 
-import { jest } from '@jest/globals';
+// import { jest } from '@jest/globals'; // Commented out - not used in these tests
 
-// Mock data for testing
-const mockDate = new Date('2024-01-15T10:30:00Z');
-const mockAmount = 25.50;
+// Mock data for testing - keeping for potential future use
+// const mockDate = new Date('2024-01-15T10:30:00Z');
+// const mockAmount = 25.50;
 
 describe('Formatters', () => {
   describe('currency formatting', () => {

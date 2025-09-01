@@ -38,7 +38,7 @@ describe('Authentication Logic', () => {
       let currentUser = null;
 
       // Simulate login
-      const login = (user: any, token: string) => {
+      const login = (user: { id: string; email: string; name: string }, token: string) => {
         if (user && token) {
           currentUser = user;
           isAuthenticated = true;
@@ -205,7 +205,7 @@ describe('Data Processing Logic', () => {
 
   describe('balance calculations', () => {
     it('should calculate who owes what', () => {
-      const calculateBalances = (expenses: any[]) => {
+      const calculateBalances = (expenses: Array<{ amount: number; paidBy: string; participants: string[] }>) => {
         const balances: Record<string, number> = {};
         
         expenses.forEach(expense => {

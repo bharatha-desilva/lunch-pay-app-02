@@ -49,7 +49,7 @@ export const performanceMonitor = {
 // Bundle size optimization utilities
 export const bundleOptimization = {
   // Lazy import with error handling
-  lazyImport: <T extends { default: unknown }>(importFn: () => Promise<T>) => {
+  lazyImport: <T extends { default: React.ComponentType }>(importFn: () => Promise<T>) => {
     return React.lazy(async () => {
       try {
         return await importFn();

@@ -106,15 +106,16 @@ export function ButtonLoading({
   isLoading, 
   children, 
   loadingText, 
+  disabled,
   ...props 
 }: { 
   isLoading: boolean; 
   children: React.ReactNode; 
   loadingText?: string; 
-  [key: string]: unknown; 
-}) {
+  disabled?: boolean;
+} & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   return (
-    <button {...props} disabled={isLoading || props.disabled}>
+    <button {...props} disabled={isLoading || disabled}>
       {isLoading ? (
         <div className="flex items-center space-x-2">
           <LoadingSpinner size="sm" />
